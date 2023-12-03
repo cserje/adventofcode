@@ -11,7 +11,7 @@ fs.readFileSync("input.txt", { encoding: "utf-8" })
         if (/[0-9]/.test(value)) {
           return Number(value);
         }
-        if (/[^0-9.]/.test(value)) {
+        if (/[*]/.test(value)) {
           symbols.push([rowIndex, columnIndex]);
         }
         return value;
@@ -59,22 +59,25 @@ const getNumber = (rowIndex, columnIndex, multiplier = 1) => {
   );
 };
 
-const distinctNumbers = new Map();
-
+let sum = 0;
 symbols
   .map(([rowIndex, columnIndex]) => {
     return getNumberNeighbours(rowIndex, columnIndex);
   })
+  .filter((neighbours) => neighbours.length > 0)
   .forEach((neighbours) => {
+    const indexes = new Map();
     neighbours.forEach(([rowIndex, columnIndex]) => {
       const [i, j] = getNumberEndIndex(rowIndex, columnIndex);
-      distinctNumbers.set(`${i},${j}`, getNumber(i, j));
+      indexes.set(`${i},${j}`, getNumber(i, j));
     });
+    if (indexes.size === 2) {
+      const [a, b] = Array.from(indexes.values());
+      sum += a * b;
+    }
   });
 
-let sum = Array.from(distinctNumbers.values()).reduce((a, b) => a + b, 0);
-
-console.log("--- Part One ---");
+console.log("--- Part Two ---");
 console.log(
   `The sum of all of the part numbers in the engine schematic is: \x1b[32m${sum}\x1b[0m`
 );
